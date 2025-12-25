@@ -54,7 +54,7 @@ if "quiz_index" not in st.session_state:
 
 # ====================== FLASHCARDS ======================
 def show_flashcards():
-    st.title("📚 LLB Flashcards (English Only)")
+    st.title("📚 LLB Flashcards")
     
     if not st.session_state.cards:
         st.warning("No flashcards found.")
@@ -159,4 +159,5 @@ with tab1:
     show_flashcards()
 
 with tab2:
+
     show_quiz()
