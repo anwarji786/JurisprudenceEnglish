@@ -100,7 +100,7 @@ def start_quiz(num_questions):
     st.session_state.quiz_active = True
 
 def show_quiz():
-    st.title("📝 LLB Quiz (English Only)")
+    st.title("📝 LLB Quiz ")
     
     if not st.session_state.cards:
         st.warning("No flashcards loaded. Go to Flashcards tab first.")
