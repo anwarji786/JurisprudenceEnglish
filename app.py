@@ -67,7 +67,7 @@ def show_flashcards():
     st.subheader(f"Q: {question}")
     
     if st.session_state.show_answer:
-        st.markdown(f"<div style='padding:15px; background:#f0f8ff; border-left:4px solid #4CAF50; margin:10px 0;'><strong>A:</strong><br>{answer}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='padding:10px; background:#f0f8ff; border-left:4px solid #4CAF50; margin:10px 0;'><strong>A:</strong><br>{answer}</div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -161,3 +161,4 @@ with tab1:
 with tab2:
 
     show_quiz()
+
