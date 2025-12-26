@@ -67,14 +67,26 @@ def show_flashcards():
     st.subheader(f"Q: {question}")
     
     if st.session_state.show_answer:
-        # ✅ MOBILE-SAFE ANSWER DISPLAY (no HTML, no overflow)
-        st.markdown("**A:**")
-        # Split answer into lines to avoid rendering issues
-        for line in answer.split('\n'):
-            if line.strip():
-                st.write(line.strip())
-            else:
-                st.write("")  # Preserve empty lines
+        # ✅ MOBILE-OPTIMIZED ANSWER BOX — LARGER FONT
+        st.markdown(
+            f"""
+            <div style="
+                padding: 14px;
+                background-color: #f8f9fa;
+                border-left: 4px solid #4CAF50;
+                border-radius: 6px;
+                margin: 12px 0;
+                font-size: 18px;          /* ← Increased font size */
+                line-height: 1.6;         /* ← Better spacing */
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                color: #333;
+            ">
+                <strong>A:</strong><br>{answer}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     
     col1, col2 = st.columns(2)
     with col1:
