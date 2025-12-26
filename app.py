@@ -1,6 +1,21 @@
 import streamlit as st
 from docx import Document
 import random
+from gtts import gTTS
+import io
+
+# ====================== UTILITY FUNCTIONS ======================
+def text_to_speech(text):
+    """Convert text to audio bytes using gTTS"""
+    try:
+        tts = gTTS(text=text, lang='en', slow=False)
+        fp = io.BytesIO()
+        tts.write_to_fp(fp)
+        fp.seek(0)
+        return fp.read()
+    except Exception as e:
+        st.error(f"🔊 Audio error: {e}")
+        return None
 
 # ====================== LOAD FLASHCARDS ======================
 def load_flashcards(doc_path):
@@ -52,6 +67,12 @@ if "user_answers" not in st.session_state:
 if "quiz_index" not in st.session_state:
     st.session_state.quiz_index = 0
 
+# Audio state
+if "audio_bytes" not in st.session_state:
+    st.session_state.audio_bytes = None
+if "is_playing" not in st.session_state:
+    st.session_state.is_playing = False
+
 # ====================== FLASHCARDS ======================
 def show_flashcards():
     st.title("📚 LLB Flashcards")
@@ -64,10 +85,32 @@ def show_flashcards():
     idx = st.session_state.deck[st.session_state.current_index]
     question, answer = st.session_state.cards[idx]
     
+    # Question section
     st.subheader(f"Q: {question}")
     
+    # Question audio controls
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🔊 Play Question"):
+            with st.spinner("Generating question audio..."):
+                st.session_state.audio_bytes = text_to_speech(question)
+                st.session_state.is_playing = True
+                st.rerun()
+    with col2:
+        if st.button("🛑 Stop Audio"):
+            st.session_state.is_playing = False
+            st.session_state.audio_bytes = None
+            st.rerun()
+    with col3:
+        if st.session_state.is_playing:
+            st.success("▶️ Question audio looping...")
+
+    # Show audio player if playing
+    if st.session_state.is_playing and st.session_state.audio_bytes:
+        st.audio(st.session_state.audio_bytes, format="audio/mp3", loop=True)
+
+    # Answer section
     if st.session_state.show_answer:
-        # ✅ ANSWER BOX: RED TEXT ON BLACK BACKGROUND
         st.markdown(
             f"""
             <div style="
@@ -88,14 +131,38 @@ def show_flashcards():
             """,
             unsafe_allow_html=True
         )
-    
+        
+        # Answer audio controls
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🔊 Play Answer"):
+                with st.spinner("Generating answer audio..."):
+                    st.session_state.audio_bytes = text_to_speech(answer)
+                    st.session_state.is_playing = True
+                    st.rerun()
+        with col2:
+            if st.button("🛑 Stop Audio", key="stop_answer"):
+                st.session_state.is_playing = False
+                st.session_state.audio_bytes = None
+                st.rerun()
+        with col3:
+            if st.session_state.is_playing:
+                st.success("▶️ Answer audio looping...")
+
+        # Show audio player for answer
+        if st.session_state.is_playing and st.session_state.audio_bytes:
+            st.audio(st.session_state.audio_bytes, format="audio/mp3", loop=True)
+
+    # Navigation buttons
     col1, col2 = st.columns(2)
     with col1:
         st.button("👁️ Show Answer", on_click=lambda: st.session_state.update(show_answer=True))
     with col2:
         st.button("⏭️ Next Card", on_click=lambda: st.session_state.update(
             current_index=(st.session_state.current_index + 1) % len(st.session_state.deck),
-            show_answer=False
+            show_answer=False,
+            is_playing=False,
+            audio_bytes=None
         ))
     
     st.caption(f"Card {st.session_state.current_index + 1} of {len(st.session_state.deck)}")
