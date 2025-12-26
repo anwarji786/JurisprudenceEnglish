@@ -67,20 +67,21 @@ def show_flashcards():
     st.subheader(f"Q: {question}")
     
     if st.session_state.show_answer:
-        # ✅ MOBILE-OPTIMIZED ANSWER BOX — LARGER FONT
+        # ✅ ANSWER BOX: RED TEXT ON BLACK BACKGROUND
         st.markdown(
             f"""
             <div style="
-                padding: 14px;
-                background-color: #f8f9fa;
-                border-left: 4px solid #4CAF50;
-                border-radius: 6px;
-                margin: 12px 0;
-                font-size: 18px;          /* ← Increased font size */
-                line-height: 1.6;         /* ← Better spacing */
+                padding: 16px;
+                background-color: #000000;
+                border-left: 4px solid #ff5252;
+                border-radius: 8px;
+                margin: 14px 0;
+                font-size: 18px;
+                line-height: 1.6;
                 word-wrap: break-word;
                 white-space: pre-wrap;
-                color: #333;
+                color: #ff5252;
+                font-weight: bold;
             ">
                 <strong>A:</strong><br>{answer}
             </div>
