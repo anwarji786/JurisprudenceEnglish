@@ -67,18 +67,25 @@ def show_flashcards():
     st.subheader(f"Q: {question}")
     
     if st.session_state.show_answer:
-        st.markdown(f"<div style='padding:10px; background:#f0f8ff; border-left:4px solid #4CAF50; margin:10px 0;'><strong>A:</strong><br>{answer}</div>", unsafe_allow_html=True)
+        # ✅ MOBILE-SAFE ANSWER DISPLAY (no HTML, no overflow)
+        st.markdown("**A:**")
+        # Split answer into lines to avoid rendering issues
+        for line in answer.split('\n'):
+            if line.strip():
+                st.write(line.strip())
+            else:
+                st.write("")  # Preserve empty lines
     
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Show Answer", on_click=lambda: st.session_state.update(show_answer=True))
+        st.button("👁️ Show Answer", on_click=lambda: st.session_state.update(show_answer=True))
     with col2:
-        st.button("Next Card", on_click=lambda: st.session_state.update(
+        st.button("⏭️ Next Card", on_click=lambda: st.session_state.update(
             current_index=(st.session_state.current_index + 1) % len(st.session_state.deck),
             show_answer=False
         ))
     
-    st.write(f"Card {st.session_state.current_index + 1} of {len(st.session_state.deck)}")
+    st.caption(f"Card {st.session_state.current_index + 1} of {len(st.session_state.deck)}")
 
 # ====================== QUIZ ======================
 def start_quiz(num_questions):
@@ -88,7 +95,6 @@ def start_quiz(num_questions):
     selected = random.sample(st.session_state.cards, min(num_questions, len(st.session_state.cards)))
     quiz_q = []
     for q, a in selected:
-        # Collect 3 wrong answers
         wrong_pool = [c[1] for c in st.session_state.cards if c[1] != a]
         wrong = random.sample(wrong_pool, k=min(3, len(wrong_pool)))
         options = [a] + wrong
@@ -100,7 +106,7 @@ def start_quiz(num_questions):
     st.session_state.quiz_active = True
 
 def show_quiz():
-    st.title("📝 LLB Quiz ")
+    st.title("📝 LLB Quiz")
     
     if not st.session_state.cards:
         st.warning("No flashcards loaded. Go to Flashcards tab first.")
@@ -115,7 +121,6 @@ def show_quiz():
         total = len(st.session_state.quiz_questions)
         idx = st.session_state.quiz_index
         if idx >= total:
-            # Show results
             correct = 0
             for i, (q, correct_ans, opts) in enumerate(st.session_state.quiz_questions):
                 if st.session_state.user_answers.get(i) == correct_ans:
@@ -145,10 +150,8 @@ def show_quiz():
                 else:
                     st.error("❌ Incorrect")
                     st.info(f"**Correct answer:** {correct_ans}")
-                if idx + 1 < total:
-                    st.button("➡️ Next", on_click=lambda: st.session_state.update(quiz_index=idx + 1))
-                else:
-                    st.button("🏁 Finish", on_click=lambda: st.session_state.update(quiz_index=idx + 1))
+                next_btn = "➡️ Next" if idx + 1 < total else "🏁 Finish"
+                st.button(next_btn, on_click=lambda: st.session_state.update(quiz_index=idx + 1))
 
 # ====================== MAIN ======================
 st.set_page_config(page_title="LLB Flashcards & Quiz", page_icon="📚")
@@ -159,6 +162,4 @@ with tab1:
     show_flashcards()
 
 with tab2:
-
     show_quiz()
-
